@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <script src="data/India_State.geojson"></script>
+  <script src="data/India_District.geojson"></script>
+  <title>Leaflet Example</title>
+</head>
+
+<style>
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.map_osm {
+  dispplay: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+</style>
+
+<body bgcolor="FFECD8">
+	<div id="header">
+		<img src='logo.png' alt="logoimage" class="center">
+	</div>
+	<div id="Info" style="width: 600px; height: 40px; font-family:verdana;" class="map_osm">
+        <h2>
+          <center>Leaflet via OSM</center>
+        </h2>
+    </div>
+	<br>
+	<div id="map" style="width: 750px; height: 500px;" class="map_osm">
+	</div>
+  
+<script>
+    var mapOptions = {
+      center: [30.3, 78.03],
+      zoom: 10,
+      attributionControl: false,
+      scale: true
+    }
+
+    // Defining   the  layers
+    var map = L.map('map', mapOptions);
+    var osmLayer = new L.tileLayer('https://{s}.tile.openstreetmap.de/tiles/osmde//{z}/{x}/{y}.png');
+    var rail = new L.tileLayer('https://map2.tual.fr/rail2/{z}/{x}/{y}.png');
+    var bhuvanlulc2015 = L.tileLayer.wms("https://bhuvan-vec2.nrsc.gov.in/bhuvan/wms", {
+      layers: 'lulc:UK_LULC50K_1516',
+      format: 'image/png',
+      transparent: true,
+      attribution: "Bhuvan LULC 2015"
+    });
+	
+	var bhuvangeomorphology2005 = L.tileLayer.wms("https://bhuvan-vec2.nrsc.gov.in/bhuvan/wms", {
+      layers: 'geomorphology:UK_GM50K_0506',
+      format: 'image/png',
+      transparent: true,
+      attribution: "Bhuvan Geomorphology 2005"
+    });
+
+    var geojsonLayer = L.geoJson(india_states);
+	
+	var geojsonLayer_2 = L.geoJson(india_district);
+
+    var sentinel_2020= L.tileLayer.wms("https://bis.iirs.gov.in:8443/geoserver/sdss/wms", {
+      layers: '	sdss:Sentinal2020',
+      format: 'image/png',
+      transparent: true,
+      attribution: "Sentinel 2020"
+    });
+	
+	var dem_10m = L.tileLayer.wms("http://192.168.2.25:8080/geoserver/SWM/wms", {
+      layers: 'SWM:DEM10m',
+      format: 'image/png',
+      transparent: true,
+      attribution: "DEM - 10m"
+    });
+
+    // Creating Layer Group
+    var Layers = L.layerGroup([osmLayer, rail, bhuvanlulc2015, geojsonLayer, sentinel_2020, geojsonLayer_2, dem_10m, bhuvangeomorphology2005]);
+
+    var baseMaps = {
+      "<span style='color: red'>Open Street Map </span>": osmLayer,
+    };
+    var overlayMaps = {
+      "Rails": rail,
+      "Bhuvan LULC 2015": bhuvanlulc2015,
+	  "District Boundary" : geojsonLayer_2,
+      "State Boundary": geojsonLayer,
+      "Sentinel 2020": sentinel_2020,
+	  "DEM - 10m":dem_10m,
+	  "Bhuvan Geomorphology 2005": bhuvangeomorphology2005
+    };
+
+    // Creating Layer Control
+    L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+    // Adding Default Layer to the map
+    map.addLayer(osmLayer);
+    
+    // Defining Custom icons options
+    var iconOptions = {
+      iconUrl: 'iirs.png',
+      iconSize: [50, 50]
+    }
+    
+	// Creating a custom icon
+    var customIcon = L.icon(iconOptions);
+    var markerOptions = {
+      title: "Dehradun",
+      clickable: true,
+      draggable: false,
+      icon: customIcon
+    }
+
+    var marker = L.marker([30.3408, 78.044], markerOptions).addTo(map);
+
+    var popup = marker.bindPopup(
+      '<b><center>Indian  Institute of Remote Sensing, Dehradun</center></b> <div> <img style="width:100%" src="IIRS.jpg" alt="image" </div>', {
+        minWidth: 256
+      }
+    );
+	
+	var iconOptions_2 = {
+      iconUrl: 'soi.png',
+      iconSize: [60, 60]
+    }
+    // Creating a custom icon
+    var customIcon_2 = L.icon(iconOptions_2);
+    var markerOptions_2 = {
+      title: "Survey of India",
+      clickable: true,
+      draggable: false,
+      icon: customIcon_2
+    }
+
+    var marker_2 = L.marker([30.3447, 78.0500], markerOptions_2).addTo(map);
+
+    var popup_2 = marker_2.bindPopup(
+      '<b><center>Survey of India, Dehradun</center></b> <div> <img style="width:100%" src="SOI.jpg" alt="image" </div>', {
+        minWidth: 256
+      }
+    );
+
+    // popup.openPopup();
+    var attrOptions = {
+      prefix: 'IIRS Dehradun'
+    };
+
+    // Creating an attribution
+    var attr = L.control.attribution(attrOptions);
+    attr.addTo(map);
+
+    var scale = L.control.scale();
+    scale.addTo(map);
+
+    var drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+
+    var drawControl = new L.Control.Draw({
+      position: 'topright',
+      draw: {
+        polygon: {
+          shapeOptions: {
+            color: 'purple'
+          },
+          allowIntersection: false,
+          drawError: {
+            color: 'orange',
+            timeout: 1000
+          },
+          showArea: true,
+          metric: false,
+          repeatMode: true
+        },
+        polyline: {
+          shapeOptions: {
+            color: 'red'
+          },
+        },
+        rect: {
+          shapeOptions: {
+            color: 'green'
+          },
+        },
+        circle: {
+          shapeOptions: {
+            color: 'steelblue'
+          },
+        },
+
+      },
+      edit: {
+        featureGroup: drawnItems
+      }
+    });
+    map.addControl(drawControl);
+
+    map.on('draw:created', function(e) {
+      var type = e.layerType,
+        layer = e.layer;
+
+      if (type === 'marker') {
+        layer.bindPopup('A popup!');
+      }
+
+      drawnItems.addLayer(layer);
+    });
+</script>
+
+</body>
+
+</html>

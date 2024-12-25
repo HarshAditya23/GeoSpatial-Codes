@@ -9,7 +9,7 @@ Created on Sun Sep  3 12:36:26 2023
 import geopandas as gpd
 
 # GeoDataFrame creation
-polygon = gpd.read_file(r"C:\Users\gaurh\Desktop\Rabi_2021-2022_rectified (1)\reproj_Rabi_2021-2022.shp")
+polygon = gpd.read_file(r"C:\Users\gaurh\Desktop\NEW\Field3_D1.shp")
 
 # Change the geometry
 points = polygon.copy()
@@ -19,4 +19,4 @@ points.geometry = points['geometry'].centroid
 points.crs = polygon.crs
 
 #Save the Shapefile
-points.to_file('point_centroid.shp')
+points.to_file(r'C:\Users\gaurh\Desktop\point_centroid_3.shp')
